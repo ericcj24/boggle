@@ -82,8 +82,19 @@ public class BoggleSolver {
 			visited[i*w+j] = false;
 			return;
 		}
+		// special case Qu
+		if (c=='Q' && (x.next[c].next['U'] ==null)) {
+			visited[i*w+j] = false;
+			return;
+		}
+
+		//check for potential prefix, special case first
+		if (c=='Q' && x.next[c].next['U'].val != null) {
+			String dictWord=(String)x.next[c].val + 'u';
+			sol.add(dictWord);
+		}
 		// it is a prefix, it might be a solution
-		if (x.next[c].val != null) {
+		else if (x.next[c].val != null) {
 			String dictWord=(String)x.next[c].val;
 			sol.add(dictWord);
 		}
@@ -92,6 +103,11 @@ public class BoggleSolver {
 		Node nextNode = x.next[c];
 		// update string
 		str = str+c;
+		if(c=='Q') {
+			nextNode = nextNode.next['U'];
+			str = str + 'U';
+		}
+
 		// right
 		if (j+1<w && !visited[i*w+(j+1)]) {
 			dfs(board, i, j+1, visited, str, nextNode, sol);
