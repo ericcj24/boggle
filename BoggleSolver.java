@@ -13,6 +13,8 @@ public class BoggleSolver {
 	private TwoSixWayTrie<String> dict;
 	private Set<String> dictSet;
 	private Set<String> cachedAnswer;
+	private static int Q = 'Q'-'A';
+	private static int U = 'U'-'A';
 
 
 	// Initializes the data structure using the given array of strings as the dictionary.
@@ -37,6 +39,8 @@ public class BoggleSolver {
 		if (board == null) {
 			throw new IllegalArgumentException();
 		}
+
+		cachedAnswer.clear();
 
 		solveBoard(board);
 
@@ -83,13 +87,13 @@ public class BoggleSolver {
 			return;
 		}
 		// special case Qu
-		if (c=='Q' && (x.next[c].next['U'] ==null)) {
+		if (c==Q && (x.next[c].next[U] ==null)) {
 			visited[i*jw+j] = false;
 			return;
 		}
 
 		//check for potential prefix, special case first
-		if (c=='Q' && x.next[c].next['U'].val != null) {
+		if (c==Q && x.next[c].next[U].val != null) {
 			String dictWord=(String)x.next[c].val + 'u';
 			sol.add(dictWord);
 		}
@@ -103,8 +107,8 @@ public class BoggleSolver {
 		Node nextNode = x.next[c];
 		// update string
 		str = str+c;
-		if(c=='Q') {
-			nextNode = nextNode.next['U'];
+		if(c==Q) {
+			nextNode = nextNode.next[U];
 			str = str + 'U';
 		}
 
