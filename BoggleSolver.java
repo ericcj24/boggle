@@ -2,8 +2,7 @@ package com.princeton.algorithms2.week4;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import com.princeton.algorithms2.week4.TwoSixWayTrie.Node;
+import java.util.TreeSet;
 
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
@@ -25,7 +24,7 @@ public class BoggleSolver {
 
 		dict = new TwoSixWayTrie<>();
 		dictSet = new HashSet<>();
-		cachedAnswer = new HashSet<>();
+		cachedAnswer = new TreeSet<>();
 
 		for (String word : dictionary) {
 			this.dict.put(word, word);
@@ -74,17 +73,18 @@ public class BoggleSolver {
 
 	private void dfs(char[][] board, int i, int j, boolean[] visited, String str, Node x, Set<String> sol) {
 		// only add solution if solution does not exist yet
-		int w=board[0].length;
-		visited[i*w+j] = true;
-		char c = board[i][j];
+		int iw = board.length;
+		int jw=board[0].length;
+		visited[i*jw+j] = true;
+		int c = board[i][j]-'A';
 		// if there is NOT a child for this char, means not prefix
 		if (x.next[c] == null) {
-			visited[i*w+j] = false;
+			visited[i*jw+j] = false;
 			return;
 		}
 		// special case Qu
 		if (c=='Q' && (x.next[c].next['U'] ==null)) {
-			visited[i*w+j] = false;
+			visited[i*jw+j] = false;
 			return;
 		}
 
@@ -109,38 +109,38 @@ public class BoggleSolver {
 		}
 
 		// right
-		if (j+1<w && !visited[i*w+(j+1)]) {
+		if (j+1<jw && !visited[i*jw+(j+1)]) {
 			dfs(board, i, j+1, visited, str, nextNode, sol);
 		}
 		// down
-		if (i+1<w && !visited[(i+1)*w+j]) {
+		if (i+1<iw && !visited[(i+1)*jw+j]) {
 			dfs(board, i+1, j, visited, str, nextNode, sol);
 		}
 		// up
-		if (i-1>=0 && !visited[(i-1)*w+ j]) {
+		if (i-1>=0 && !visited[(i-1)*jw+ j]) {
 			dfs(board, i-1, j, visited, str, nextNode, sol);
 		}
 		// left
-		if (j-1>=0 && !visited[i*w+(j-1)]) {
+		if (j-1>=0 && !visited[i*jw+(j-1)]) {
 			dfs(board, i, j-1, visited, str, nextNode, sol);
 		}
 		// up-right
-		if ((j+1<w) && (i-1>=0) && !visited[(i-1)*w+(j+1)]) {
+		if ((j+1<jw) && (i-1>=0) && !visited[(i-1)*jw+(j+1)]) {
 			dfs(board, i-1, j+1, visited, str, nextNode, sol);
 		}
 		// up-left
-		if ((j-1>=0) && (i-1>=0) && !visited[(i-1)*w+(j-1)]) {
+		if ((j-1>=0) && (i-1>=0) && !visited[(i-1)*jw+(j-1)]) {
 			dfs(board, i-1, j-1, visited, str, nextNode, sol);
 		}
 		// down-right
-		if ((j+1<w) && (i+1<w) && !visited[(i+1)*w+(j+1)]) {
+		if ((j+1<jw) && (i+1<iw) && !visited[(i+1)*jw+(j+1)]) {
 			dfs(board, i+1, j+1, visited, str, nextNode, sol);
 		}
 		// down-left
-		if ((j-1>=0) && (i+1<w) && !visited[(i+1)*w+(j-1)]) {
+		if ((j-1>=0) && (i+1<iw) && !visited[(i+1)*jw+(j-1)]) {
 			dfs(board, i+1, j-1, visited, str, nextNode, sol);
 		}
-		visited[i*w+j] = false;
+		visited[i*jw+j] = false;
 	}
 
 	// Returns the score of the given word if it is in the dictionary, zero otherwise.
@@ -165,6 +165,37 @@ public class BoggleSolver {
 			return 1;
 		} else {
 			return 0;
+		}
+	}
+
+	// R-way trie node
+	private static int R = 26;
+    private static class Node {
+        private Object val;
+        private Node[] next = new Node[R];
+    }
+
+	private class TwoSixWayTrie<Value> {
+		Node root;
+		public TwoSixWayTrie() {
+			root = new Node();
+		}
+
+		public void put(String key, Value val) {
+			root = put(root, key, val, 0);
+		}
+
+		private Node put(Node x, String key, Value val, int d) {
+			if (x == null) {
+				x = new Node();
+			}
+			if (d==key.length()) {
+				x.val = val;
+				return x;
+			}
+			char c = key.charAt(d);
+			x.next[c-'A'] = put(x.next[c-'A'], key, val, d+1);
+			return x;
 		}
 	}
 
